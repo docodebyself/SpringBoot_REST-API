@@ -1,14 +1,17 @@
 package com.rest.api.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rest.api.service.PostService;
+import com.rest.api.utils.ValidateObject;
 import com.rest.api.utils.request.PostDTO;
-import com.rest.api.utils.response.PostResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/post")
@@ -23,7 +26,11 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<PostResponseDTO> create(@Valid @RequestBody PostDTO dto) {
+    public ResponseEntity<Object> create(@RequestBody PostDTO dto) {
+        Map<String, String> errorValidator = ValidateObject.validatePostDTO(dto);
+        if(!ObjectUtils.isEmpty(errorValidator)){
+            return new ResponseEntity<>(errorValidator, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(postService.save(dto), HttpStatus.OK);
     }
 
