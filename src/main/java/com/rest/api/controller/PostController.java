@@ -1,10 +1,16 @@
 package com.rest.api.controller;
 
+import com.rest.api.entity.Post;
 import com.rest.api.repository.PostRepository;
 import com.rest.api.service.PostService;
+import com.rest.api.utils.PageDTO;
 import com.rest.api.utils.ValidateObject;
 import com.rest.api.utils.request.PostDTO;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
@@ -50,6 +56,29 @@ public class PostController {
         return new ResponseEntity<>(postService.findById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/getAllWithPage")
+    public ResponseEntity<Page<Post>> getAllWithPage(@PageableDefault Pageable pageable){
+        return new ResponseEntity<>(postRepository.findAll(pageable), HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllWithTitlePage")
+    public ResponseEntity<Page<Post>> getAllWithTitlePage(@RequestParam(defaultValue = "", required = false) String title,
+                                                          @PageableDefault Pageable pageable){
+        return new ResponseEntity<>(postRepository.findByTitle(title, pageable), HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllWithPageCustom")
+    public ResponseEntity<PageDTO> getAllWithPageCustom(
+                                    @RequestParam(defaultValue = "10", required = false) int size,
+                                    @RequestParam(defaultValue = "1", required = false) int page,
+                                    @RequestParam(defaultValue = "asc", required = false) String direction,
+                                    @RequestParam(defaultValue =  "", required = false) String properties,
+                                    @RequestParam(defaultValue = "", required = false) String content,
+                                    @RequestParam(defaultValue = "", required = false) String title){
+        return new ResponseEntity<>(
+                postRepository.findAllWithCustomPage(size, page, direction, properties, content, title),
+                HttpStatus.OK);
+    }
 
 
 }

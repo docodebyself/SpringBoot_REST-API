@@ -65,4 +65,6 @@ public class Comment {
     @JsonIgnore
     @JoinColumn(name = "post_id")
     private Post post;
+
+
 }
